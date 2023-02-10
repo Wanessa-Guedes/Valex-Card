@@ -1,6 +1,8 @@
 package com.api.valex.Services;
 
+import com.api.valex.Controllers.dto.ActivCardDto;
 import com.api.valex.Controllers.dto.CreateCardDto;
+import com.api.valex.Middlewares.ErrorHandler400;
 import com.api.valex.Middlewares.ErrorHandler404;
 import com.api.valex.Middlewares.ErrorHandler409;
 import com.api.valex.Models.Cards;
@@ -17,7 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 @Service
@@ -58,13 +63,35 @@ public class CardService {
         newCard.setEmployee(employee);
         newCard.setNumber(fake.finance().creditCard(CreditCardType.VISA));
         newCard.setCardHolderName(employee.getFullname());
-        newCard.setSecurityCode(fake.finance().iban());
-        newCard.setExpirationDate(String.valueOf(LocalDate.now().plusYears(5)));
+        newCard.setSecurityCode(String.valueOf(ThreadLocalRandom.current().nextInt(100,1000)));
+        newCard.setExpirationDate(LocalDate.now().plusYears(5));
         newCard.setVirtual(false);
         newCard.setBlocked(false);
         newCard.setType(req.getType());
 
         cardRepository.save(newCard);
 
+    }
+
+    public void ActivateCard(ActivCardDto req) throws ErrorHandler400, ErrorHandler404 {
+        Cards card = cardRepository.findById(req.getCardId());
+        if(card == null){
+            throw new ErrorHandler404("404", "Cartão não encontrado");
+        }
+        if(card.getPassword() != null){
+            throw new ErrorHandler400("400", "Cartão já cadastrado");
+        }
+        LocalDate todayDate = LocalDate.now();
+        if(todayDate.isAfter(card.getExpirationDate())){
+            throw new ErrorHandler400("400", "Cartão expirado");
+        }
+        if(!card.getSecurityCode().equals(req.getSecurityCode())){
+            throw new ErrorHandler400("400", "Código de segurança incorreto");
+        }
+
+        // VOLTAR DEPOIS PARA APLICAR A CRIPTOGRAFIA DE SENHA
+
+        card.setPassword(req.getPassword());
+        cardRepository.save(card);
     }
 }

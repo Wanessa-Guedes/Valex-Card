@@ -1,6 +1,7 @@
 package com.api.valex.Models;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -16,7 +17,7 @@ public class Cards {
     private String cardHolderName;
 
     private String securityCode;
-    private String expirationDate;
+    private LocalDate expirationDate;
 
     private String password;
 
@@ -73,11 +74,11 @@ public class Cards {
         this.securityCode = securityCode;
     }
 
-    public String getExpirationDate() {
+    public LocalDate getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(String expirationDate) {
+    public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
     }
 

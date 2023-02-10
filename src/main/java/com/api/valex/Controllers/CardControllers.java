@@ -1,6 +1,8 @@
 package com.api.valex.Controllers;
 
+import com.api.valex.Controllers.dto.ActivCardDto;
 import com.api.valex.Controllers.dto.CreateCardDto;
+import com.api.valex.Middlewares.ErrorHandler400;
 import com.api.valex.Middlewares.ErrorHandler404;
 import com.api.valex.Middlewares.ErrorHandler409;
 import com.api.valex.Models.TransactionType;
@@ -25,5 +27,12 @@ public class CardControllers {
         cardService.CreateCard(xApiKey, req);
 
         return ResponseEntity.created(URI.create("/card")).build();
+    }
+
+    @PostMapping("/activate")
+    public ResponseEntity<Object> ActivateCards(@RequestBody ActivCardDto req) throws ErrorHandler400, ErrorHandler404 {
+        cardService.ActivateCard(req);
+
+        return ResponseEntity.ok().build();
     }
 }
