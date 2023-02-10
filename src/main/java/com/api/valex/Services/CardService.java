@@ -1,6 +1,7 @@
 package com.api.valex.Services;
 
 import com.api.valex.Controllers.dto.ActivCardDto;
+import com.api.valex.Controllers.dto.BlockCardDto;
 import com.api.valex.Controllers.dto.CreateCardDto;
 import com.api.valex.Middlewares.ErrorHandler400;
 import com.api.valex.Middlewares.ErrorHandler404;
@@ -39,15 +40,15 @@ public class CardService {
 
     public void CreateCard(String xApiKey, CreateCardDto req) throws ErrorHandler404, ErrorHandler409 {
         Companies company = companiesRepository.findByApiKey(xApiKey);
-        if(company == null){
+        if (company == null) {
             throw new ErrorHandler404("404", "Empresa não registrada");
         }
         Employees employee = employeeRepsoitory.findById(req.getEmployeeId()).orElse(null);
-        if(employee == null){
+        if (employee == null) {
             throw new ErrorHandler404("404", "Funcionário não registrado");
         }
 
-        if(!EnumUtils.isValidEnum(TransactionType.class, req.getType().toString())){
+        if (!EnumUtils.isValidEnum(TransactionType.class, req.getType().toString())) {
             throw new ErrorHandler404("404", "Tipo de cartão não registrado");
         }
 
@@ -63,7 +64,7 @@ public class CardService {
         newCard.setEmployee(employee);
         newCard.setNumber(fake.finance().creditCard(CreditCardType.VISA));
         newCard.setCardHolderName(employee.getFullname());
-        newCard.setSecurityCode(String.valueOf(ThreadLocalRandom.current().nextInt(100,1000)));
+        newCard.setSecurityCode(String.valueOf(ThreadLocalRandom.current().nextInt(100, 1000)));
         newCard.setExpirationDate(LocalDate.now().plusYears(5));
         newCard.setVirtual(false);
         newCard.setBlocked(false);
@@ -75,23 +76,75 @@ public class CardService {
 
     public void ActivateCard(ActivCardDto req) throws ErrorHandler400, ErrorHandler404 {
         Cards card = cardRepository.findById(req.getCardId());
-        if(card == null){
+        if (card == null) {
             throw new ErrorHandler404("404", "Cartão não encontrado");
         }
-        if(card.getPassword() != null){
+        if (card.getPassword() != null) {
             throw new ErrorHandler400("400", "Cartão já cadastrado");
         }
         LocalDate todayDate = LocalDate.now();
-        if(todayDate.isAfter(card.getExpirationDate())){
+        if (todayDate.isAfter(card.getExpirationDate())) {
             throw new ErrorHandler400("400", "Cartão expirado");
         }
-        if(!card.getSecurityCode().equals(req.getSecurityCode())){
+        if (!card.getSecurityCode().equals(req.getSecurityCode())) {
             throw new ErrorHandler400("400", "Código de segurança incorreto");
         }
 
         // VOLTAR DEPOIS PARA APLICAR A CRIPTOGRAFIA DE SENHA
 
         card.setPassword(req.getPassword());
+        cardRepository.save(card);
+    }
+
+    public Cards GetTransactions(long id) {
+        Cards card = cardRepository.findById(id);
+        return card;
+    }
+
+    // Tem que criar um objeto dto só para receber o password??
+    public void BlockCard(long id, BlockCardDto password) throws ErrorHandler404, ErrorHandler400 {
+        Cards card = cardRepository.findById(id);
+        if(card == null){
+            throw new ErrorHandler404("404", "Cartão não encontrado");
+        }
+        if(card.getPassword() == null){
+            throw new ErrorHandler400("400", "Cartão não ativado");
+        }
+        LocalDate todayDate = LocalDate.now();
+        if (todayDate.isAfter(card.getExpirationDate())) {
+            throw new ErrorHandler400("400", "Cartão expirado");
+        }
+        if(card.getBlocked()){
+           throw new ErrorHandler400("400", "Cartão já bloqueado");
+        }
+        if(!card.getPassword().equals(password.getPassword())){
+            throw new ErrorHandler400("400", "Senha incorreta");
+        }
+
+        card.setBlocked(true);
+        cardRepository.save(card);
+    }
+
+    public void UnBlockCard(long id, BlockCardDto password) throws ErrorHandler404, ErrorHandler400 {
+        Cards card = cardRepository.findById(id);
+        if(card == null){
+            throw new ErrorHandler404("404", "Cartão não encontrado");
+        }
+        if(card.getPassword() == null){
+            throw new ErrorHandler400("400", "Cartão não ativado");
+        }
+        LocalDate todayDate = LocalDate.now();
+        if (todayDate.isAfter(card.getExpirationDate())) {
+            throw new ErrorHandler400("400", "Cartão expirado");
+        }
+        if(!card.getBlocked()){
+            throw new ErrorHandler400("400", "Cartão já está desbloqueado");
+        }
+        if(!card.getPassword().equals(password.getPassword())){
+            throw new ErrorHandler400("400", "Senha incorreta");
+        }
+
+        card.setBlocked(false);
         cardRepository.save(card);
     }
 }
