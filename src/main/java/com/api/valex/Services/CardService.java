@@ -2,6 +2,7 @@ package com.api.valex.Services;
 
 import com.api.valex.Controllers.dto.ActivCardDto;
 import com.api.valex.Controllers.dto.BlockCardDto;
+import com.api.valex.Controllers.dto.CardGetDto;
 import com.api.valex.Controllers.dto.CreateCardDto;
 import com.api.valex.Middlewares.ErrorHandler400;
 import com.api.valex.Middlewares.ErrorHandler404;
@@ -96,9 +97,13 @@ public class CardService {
         cardRepository.save(card);
     }
 
-    public Cards GetTransactions(long id) {
+    public CardGetDto GetTransactions(long id) throws ErrorHandler404 {
         Cards card = cardRepository.findById(id);
-        return card;
+        if(card == null){
+            throw new ErrorHandler404("404", "Cartão não encontrado");
+        }
+        CardGetDto  cardDto = new CardGetDto(card);
+        return cardDto;
     }
 
     // Tem que criar um objeto dto só para receber o password??

@@ -2,6 +2,7 @@ package com.api.valex.Controllers;
 
 import com.api.valex.Controllers.dto.ActivCardDto;
 import com.api.valex.Controllers.dto.BlockCardDto;
+import com.api.valex.Controllers.dto.CardGetDto;
 import com.api.valex.Controllers.dto.CreateCardDto;
 import com.api.valex.Middlewares.ErrorHandler400;
 import com.api.valex.Middlewares.ErrorHandler404;
@@ -40,8 +41,8 @@ public class CardControllers {
 
     // PULAR ESSA PARA DEPOIS DO RECARGA E COMPRAS (PENSAR EM COMO MONTAR O OBJETO)
     @GetMapping("/infos/{id}")
-    public ResponseEntity<Cards> GetInfosCard(@PathVariable(value = "id") long id){
-        Cards card = cardService.GetTransactions(id);
+    public ResponseEntity<CardGetDto> GetInfosCard(@PathVariable(value = "id") long id) throws ErrorHandler404 {
+        CardGetDto card = cardService.GetTransactions(id);
         return ResponseEntity.ok().body(card);
     }
 

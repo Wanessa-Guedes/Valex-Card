@@ -1,11 +1,11 @@
 package com.api.valex.Repositories;
 
-import com.api.valex.Models.Payments;
+import com.api.valex.Models.Businesses;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<Payments, Long> {
+public interface BusinessesRepository extends JpaRepository<Businesses, Long> {
 
-    Payments findByCardId(long id);
+    Businesses findById(long id);
 }

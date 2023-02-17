@@ -1,5 +1,6 @@
 package com.api.valex.Controllers;
 
+import com.api.valex.Controllers.dto.PaymentCardDto;
 import com.api.valex.Controllers.dto.ReechargeCardDto;
 import com.api.valex.Middlewares.ErrorHandler400;
 import com.api.valex.Middlewares.ErrorHandler404;
@@ -20,6 +21,12 @@ public class TransactionsController {
                                                @RequestBody ReechargeCardDto req) throws ErrorHandler404, ErrorHandler400 {
         transactionsService.RechargeCard(xApiKey, req);
 
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/payment")
+    public ResponseEntity<Object> PaymentCard(@RequestBody PaymentCardDto req) throws ErrorHandler404, ErrorHandler400 {
+        transactionsService.PaymentCard(req);
         return ResponseEntity.ok().build();
     }
 }

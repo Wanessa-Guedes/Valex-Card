@@ -1,46 +1,67 @@
-package com.api.valex.Models;
+package com.api.valex.Controllers.dto;
+
+import com.api.valex.Models.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@Entity
-@Table(name="cards")
-public class Cards {
+public class CardGetDto {
+        private long id;
+        private String number;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+        private String cardHolderName;
 
-    private String number;
+        private String securityCode;
+        private LocalDate expirationDate;
 
-    private String cardHolderName;
+        private String password;
 
-    private String securityCode;
-    private LocalDate expirationDate;
+        private Boolean isVirtual;
 
-    private String password;
+        private Boolean isBlocked;
 
-    private Boolean isVirtual;
+        private TransactionType type;
 
-    private Boolean isBlocked;
+        private Employees employee;
 
-    @Enumerated(EnumType.STRING)
-    private TransactionType type;
+        private List<Payments> payments;
 
-    @ManyToOne
-    @JoinColumn(name="employee_id")
-    private Employees employee;
+        private List<Recharges> recharges;
 
-    @ManyToOne
-    @JoinColumn(name="originalCardId")
-    private  Cards card;
+    public CardGetDto() {
+    }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "card")
-    private List<Payments> payments;
+    public CardGetDto(long id, String number, String cardHolderName, String securityCode, LocalDate expirationDate, String password, Boolean isVirtual, Boolean isBlocked, TransactionType type, Employees employee, List<Payments> payments, List<Recharges> recharges) {
+        this.id = id;
+        this.number = number;
+        this.cardHolderName = cardHolderName;
+        this.securityCode = securityCode;
+        this.expirationDate = expirationDate;
+        this.password = password;
+        this.isVirtual = isVirtual;
+        this.isBlocked = isBlocked;
+        this.type = type;
+        this.employee = employee;
+        this.payments = payments;
+        this.recharges = recharges;
+    }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "card")
-    private List<Recharges> recharges;
+    public CardGetDto(Cards card) {
+        this.id = card.getId();
+        this.number = card.getNumber();
+        this.cardHolderName = card.getCardHolderName();
+        this.securityCode = card.getSecurityCode();
+        this.expirationDate = card.getExpirationDate();
+        this.password = card.getPassword();
+        this.isVirtual = card.getVirtual();
+        this.isBlocked = card.getBlocked();
+        this.type = card.getType();
+        this.employee = card.getEmployee();
+        this.payments = card.getPayments();
+        this.recharges = card.getRecharges();
+
+    }
 
     public long getId() {
         return id;
@@ -120,14 +141,6 @@ public class Cards {
 
     public void setEmployee(Employees employee) {
         this.employee = employee;
-    }
-
-    public Cards getCard() {
-        return card;
-    }
-
-    public void setCard(Cards card) {
-        this.card = card;
     }
 
     public List<Payments> getPayments() {
