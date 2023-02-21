@@ -1,26 +1,22 @@
-package com.api.valex.Models;
+package com.api.valex.Controllers.dto;
 
-import javax.persistence.*;
+import com.api.valex.Models.Recharges;
+
 import java.sql.Timestamp;
 import java.util.List;
 
-@Entity
-@Table(name = "recharges")
-public class Recharges {
+public class RechargeDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Timestamp timestamp;
 
     private float amount;
 
-    @ManyToOne
-    @JoinColumn(name="card_id")
-    private Cards card;
-
-    public Recharges() {
+    public RechargeDto(Recharges recharge) {
+            this.id = recharge.getId();
+            this.timestamp = recharge.getTimestamp();
+            this.amount = recharge.getAmount();
     }
 
     public Long getId() {
@@ -47,11 +43,4 @@ public class Recharges {
         this.amount = amount;
     }
 
-    public Cards getCard() {
-        return card;
-    }
-
-    public void setCard(Cards card) {
-        this.card = card;
-    }
 }

@@ -1,35 +1,31 @@
-package com.api.valex.Models;
+package com.api.valex.Controllers.dto;
 
-import com.api.valex.Controllers.dto.CompanyDto;
+import com.api.valex.Models.Companies;
+import com.api.valex.Models.Employees;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-@Entity
-@Table(name = "employees")
-public class Employees {
+public class EmployeeDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String fullname;
 
-    @NotBlank(message = "CPF não pode estar em branco.")
-    @Size(min = 11, max = 11)
     private String cpf;
 
-    @Email
-    @NotBlank(message = "Email não pode estar em branco.")
     private String email;
 
-    @ManyToOne
-    @JoinColumn(name = "company_id")
-    private Companies company;
+    private CompanyDto company;
 
-    public Employees() {
+    public EmployeeDto(Employees employee) {
+        this.id = employee.getId();
+        this.fullname = employee.getFullname();
+        this.cpf = employee.getCpf();
+        this.email = employee.getEmail();
+        this.company = new CompanyDto(employee.getCompany());
     }
 
     public long getId() {
@@ -64,13 +60,11 @@ public class Employees {
         this.email = email;
     }
 
-    public Companies getCompany() {
+    public CompanyDto getCompany() {
         return company;
     }
 
-    public void setCompany(Companies company) {
+    public void setCompany(CompanyDto company) {
         this.company = company;
     }
-
-
 }

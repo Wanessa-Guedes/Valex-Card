@@ -4,6 +4,8 @@ import com.api.valex.Models.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class CardGetDto {
@@ -23,16 +25,16 @@ public class CardGetDto {
 
         private TransactionType type;
 
-        private Employees employee;
+        private EmployeeDto employee;
 
-        private List<Payments> payments;
+        private List<PaymentCardDto> payments;
 
-        private List<Recharges> recharges;
+        private List<RechargeDto> recharges;
 
     public CardGetDto() {
     }
 
-    public CardGetDto(long id, String number, String cardHolderName, String securityCode, LocalDate expirationDate, String password, Boolean isVirtual, Boolean isBlocked, TransactionType type, Employees employee, List<Payments> payments, List<Recharges> recharges) {
+    public CardGetDto(long id, String number, String cardHolderName, String securityCode, LocalDate expirationDate, String password, Boolean isVirtual, Boolean isBlocked, TransactionType type, EmployeeDto employee, List<PaymentCardDto> payments, List<RechargeDto> recharges) {
         this.id = id;
         this.number = number;
         this.cardHolderName = cardHolderName;
@@ -48,6 +50,10 @@ public class CardGetDto {
     }
 
     public CardGetDto(Cards card) {
+        List<RechargeDto> recharg = new ArrayList<>();
+        card.getRecharges().forEach(obj -> recharg.add(new RechargeDto(obj)));
+        List<PaymentCardDto> payment = new ArrayList<>();
+        card.getPayments().forEach(obj -> payment.add(new PaymentCardDto(obj)));
         this.id = card.getId();
         this.number = card.getNumber();
         this.cardHolderName = card.getCardHolderName();
@@ -57,10 +63,9 @@ public class CardGetDto {
         this.isVirtual = card.getVirtual();
         this.isBlocked = card.getBlocked();
         this.type = card.getType();
-        this.employee = card.getEmployee();
-        this.payments = card.getPayments();
-        this.recharges = card.getRecharges();
-
+        this.employee = new EmployeeDto(card.getEmployee());
+        this.payments = payment;
+        this.recharges = recharg;
     }
 
     public long getId() {
@@ -135,27 +140,27 @@ public class CardGetDto {
         this.type = type;
     }
 
-    public Employees getEmployee() {
+    public EmployeeDto getEmployee() {
         return employee;
     }
 
-    public void setEmployee(Employees employee) {
+    public void setEmployee(EmployeeDto employee) {
         this.employee = employee;
     }
 
-    public List<Payments> getPayments() {
+    public List<PaymentCardDto> getPayments() {
         return payments;
     }
 
-    public void setPayments(List<Payments> payments) {
+    public void setPayments(List<PaymentCardDto> payments) {
         this.payments = payments;
     }
 
-    public List<Recharges> getRecharges() {
+    public List<RechargeDto> getRecharges() {
         return recharges;
     }
 
-    public void setRecharges(List<Recharges> recharges) {
+    public void setRecharges(List<RechargeDto> recharges) {
         this.recharges = recharges;
     }
 }

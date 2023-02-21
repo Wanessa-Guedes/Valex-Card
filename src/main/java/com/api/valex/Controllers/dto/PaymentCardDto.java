@@ -1,5 +1,7 @@
 package com.api.valex.Controllers.dto;
 
+import com.api.valex.Models.Payments;
+
 public class PaymentCardDto {
 
     private long cardId;
@@ -8,6 +10,15 @@ public class PaymentCardDto {
     private Float amount;
 
     private long businessId;
+
+    public PaymentCardDto(Payments payment) {
+        this.cardId = payment.getCard().getId();
+        this.amount = payment.getAmount();
+        this.businessId = payment.getBusiness().getId();
+    }
+
+    public PaymentCardDto() {
+    }
 
     public long getCardId() {
         return cardId;

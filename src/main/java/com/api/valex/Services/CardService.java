@@ -4,6 +4,7 @@ import com.api.valex.Controllers.dto.ActivCardDto;
 import com.api.valex.Controllers.dto.BlockCardDto;
 import com.api.valex.Controllers.dto.CardGetDto;
 import com.api.valex.Controllers.dto.CreateCardDto;
+import com.api.valex.Middlewares.Crypt;
 import com.api.valex.Middlewares.ErrorHandler400;
 import com.api.valex.Middlewares.ErrorHandler404;
 import com.api.valex.Middlewares.ErrorHandler409;
@@ -25,6 +26,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static com.api.valex.Middlewares.Crypt.crypt;
 
 
 @Service
@@ -92,8 +95,8 @@ public class CardService {
         }
 
         // VOLTAR DEPOIS PARA APLICAR A CRIPTOGRAFIA DE SENHA
-
-        card.setPassword(req.getPassword());
+        String cryptPass = crypt(req.getPassword());
+        card.setPassword(cryptPass);
         cardRepository.save(card);
     }
 
@@ -122,7 +125,8 @@ public class CardService {
         if(card.getBlocked()){
            throw new ErrorHandler400("400", "Cartão já bloqueado");
         }
-        if(!card.getPassword().equals(password.getPassword())){
+        String cryptPass = crypt(password.getPassword());
+        if(!card.getPassword().equals(cryptPass)){
             throw new ErrorHandler400("400", "Senha incorreta");
         }
 
@@ -145,7 +149,8 @@ public class CardService {
         if(!card.getBlocked()){
             throw new ErrorHandler400("400", "Cartão já está desbloqueado");
         }
-        if(!card.getPassword().equals(password.getPassword())){
+        String cryptPass = crypt(password.getPassword());
+        if(!card.getPassword().equals(cryptPass)){
             throw new ErrorHandler400("400", "Senha incorreta");
         }
 

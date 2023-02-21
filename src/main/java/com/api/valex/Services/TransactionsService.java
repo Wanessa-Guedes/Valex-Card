@@ -14,6 +14,9 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.api.valex.Middlewares.Crypt.crypt;
 
 @Service
 public class TransactionsService {
@@ -108,7 +111,8 @@ public class TransactionsService {
             throw new ErrorHandler400("400", "Cartão bloqueado");
         }
 
-        if(card.getPassword() != req.getPassword()){
+        String cryptPass = crypt(req.getPassword());
+        if(!card.getPassword().equals(cryptPass)){
             throw new ErrorHandler400("400", "Senha incorreta");
         }
 
@@ -121,15 +125,24 @@ public class TransactionsService {
             throw new ErrorHandler400("400", "Tipo de transação incompatível");
         }
 
-        Recharges recharges = rechargesRepository.findByCardId(req.getCardId());
-        Payments payments = paymentRepository.findByCardId(req.getCardId());
-        Float balance = recharges.getAmount() - payments.getAmount() - req.getAmount();
-        payments.setCard(card);
-        payments.setAmount(req.getAmount());
-        payments.setBusiness(business);
-        payments.setTimestamp(Timestamp.valueOf(LocalDate.now().atStartOfDay()));
+        List<Recharges> recharges = rechargesRepository.findAllByCardId(req.getCardId());
+        List<Payments> payments = paymentRepository.findAllByCardId(req.getCardId());
+        Float totalRecharge = 0.0F;
+        for(Recharges r : recharges){
+            totalRecharge += r.getAmount();
+        }
+        Float totalPayments = 0.0F;
+        for(Payments p : payments){
+            totalPayments += p.getAmount();
+        }
+        Float balance = totalRecharge - totalPayments - req.getAmount();
+        Payments payment = new Payments();
+        payment.setCard(card);
+        payment.setAmount(req.getAmount());
+        payment.setBusiness(business);
+        payment.setTimestamp(Timestamp.valueOf(LocalDate.now().atStartOfDay()));
         if(balance>0){
-            paymentRepository.save(payments);
+            paymentRepository.save(payment);
         } else {
             throw new ErrorHandler400("400", "Não há fundos suficientes para completar a transação");
         }
