@@ -13,4 +13,6 @@ public interface CardRepository extends JpaRepository<Cards, Long> {
     List<Cards> findAllByEmployeeId(Long employeeId);
 
     Cards findById(long id);
+
+    Cards findBySecurityCode(String securityCode);
 }
